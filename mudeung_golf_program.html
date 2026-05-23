@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>무등총원우회 골프월례대회 조편성</title>
+    <style>
+        /* [1. 전체 및 입력 제어판 스타일] */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif; /* 고급스러운 폰트 사용 추천 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f0f2f5; /* 기본 배경 */
+        }
+
+        /* 입력 폼 제어판 */
+        #control-panel {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            flex: 1 1 calc(33% - 15px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="date"],
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        #actions {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-sort {
+            background-color: #f7b731;
+            color: white;
+        }
+        .btn-sort:hover {
+            background-color: #fca130;
+        }
+
+        .btn-shuffle {
+            background-color: #2bcbba;
+            color: white;
+        }
+        .btn-shuffle:hover {
+            background-color: #26af9f;
+        }
+
+        .btn-download {
+            background-color: #d1d8e0;
+            color: #333;
+        }
+        .btn-download:hover {
+            background-color: #a5b1c2;
+        }
+
+        /* [2. 고정된 포스터 출력 스타일] */
+        #poster-container {
+            width: 100%;
+            max-width: 1024px; /* 포스터 해상도 고정 */
+            aspect-ratio: 1024 / 731; /* 포스터 비율 고정 */
+            background-image: url('https://lh3.googleusercontent.com/rd-gg-dl/A[...]); /* PGA 배경 이미지 URL로 대체 */
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            color: white; /* 기본 텍스트는 흰색 */
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        /* 상단 로고 및 타이틀 섹션 */
+        #poster-header {
+            width: 100%;
+            text-align: center;
+            padding: 30px 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-logo-area {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .custom-logo {
+            width: 150px;
+            height: auto;
+        }
+
+        .stars {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .star {
+            color: #f7b731;
+            font-size: 14px;
+        }
+
+        #poster-header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #d8c39e;
+            margin: 0;
+            letter-spacing: -1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        #poster-header h2 {
+            font-size: 18px;
+            font-weight: normal;
+            color: #ffffff;
+            margin: 5px 0 10px 0;
+            opacity: 0.9;
+        }
+
+        #event-details {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* 중앙 조 편성 카드 섹션 */
+        #poster-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 0 40px;
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        .group-card {
+            flex: 1;
+            max-width: 280px;
+            background: rgba(30, 40, 60, 0.9); /* 반투명 어두운 배경 */
+            border: 1px solid rgba(216, 195, 158, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            width: 100%;
+            background: #f7b731; /* 그룹명 배경색 고정 */
+            color: #1e283c;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .card-time {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .card-body {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-row:last-child {
+            border-bottom: none;
+        }
+
+        .player-num {
+            width: 30px;
+            font-weight: bold;
+            color: #d8c39e;
+        }
+
+        .player-name {
+            flex: 1;
+            color: white;
+            font-weight: normal;
+        }
+
+        .player-icon {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* 하단 푸터 섹션 */
+        #poster-footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            opacity: 0.6;
+            margin-top: 10px;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            width: 80px;
+            height: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="control-panel">
+    <div class="input-group">
+        <label for="event-title">대회 제목</label>
+        <input type="text" id="event-title" value="무등총원우회 골프월례대회">
+    </div>
+    <div class="input-group">
+        <label for="event-date">대회 일정</label>
+        <input type="date" id="event-date" value="2026-06-15">
+    </div>
+    <div class="input-group">
+        <label for="event-venue">장소</label>
+        <input type="text" id="event-venue" value="무등산CC">
+    </div>
+    <div class="input-group" style="flex: 1 1 100%;">
+        <label for="player-list">참가자 명단 (쉼표 또는 줄바꿈 구분)</label>
+        <textarea id="player-list">오유선,한승호,싱호,오유,홍길동,이순신,강감찬,김유신,장보고,계백,관창,을지문덕</textarea>
+    </div>
+    
+    <div id="actions">
+        <button class="btn-sort" onclick="performDraw(false)">[순서대로 편성]</button>
+        <button class="btn-shuffle" onclick="performDraw(true)">[🎲 랜덤 섞기]</button>
+        <button class="btn-download" onclick="alert('PNG 저장은 HTML2CANVAS 등 외부 라이브러리가 필요합니다.\n데모 버전에서는 포스터 디자인 고정을 확인하세요.')">[📸 PNG 저장]</button>
+    </div>
+</div>
+
+<div id="poster-container">
+    <div id="poster-header">
+        <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <div class="main-logo-area">
+            <img src="https://lh3.googleusercontent.com/rd-gg-dl/AFfU[...] /* PGA 스타일 로고 대체 이미지 */" alt="무등골프투어 로고" class="custom-logo">
+        </div>
+        <h2 id="poster-mg-tour">MG TOUR</h2>
+        <h1 id="poster-title-rendered"></h1>
+        <div id="event-details">
+            <div class="details-left">DATE: <span id="poster-date"></span></div>
+            <div class="details-venue">VENUE: <span id="poster-venue"></span></div>
+            <div class="details-right">GROUP DRAW RESULT</div>
+        </div>
+    </div>
+
+    <div id="poster-main">
+        </div>
+
+    <div id="poster-footer">
+        <img src="https://lh3.googleusercontent.com/rd-gg-dl/AFf[...] /* PGA 파트너 로고 대체 */" alt="PGA 파트너" class="footer-logo">
+        <img src="https://lh3.googleusercontent.com/rd-gg-dl/AF[...] /* 무등 로고 대체 */" alt="무등프투어" class="footer-logo">
+    </div>
+</div>
+
+<script>
+    // [JavaScript: 로직 업그레이드]
+
+    // 페이지 로드 시 초기 렌더링
+    window.onload = function() {
+        performDraw(false);
+    };
+
+    function performDraw(shuffleFlag) {
+        // 1. 입력 데이터 가져오기
+        const title = document.getElementById('event-title').value;
+        const dateInput = document.getElementById('event-date').value;
+        const venue = document.getElementById('event-venue').value;
+        const playersString = document.getElementById('player-list').value;
+
+        // 2. 입력 데이터 파싱
+        const players = playersString.split(/[\s,]+/).filter(name => name.trim() !== "");
+        if (shuffleFlag) {
+            shuffleArray(players);
+        }
+
+        // 3. 포스터 고정 영역 업데이트 (타이틀, 날짜, 장소)
+        document.getElementById('poster-title-rendered').innerText = title;
+        document.getElementById('poster-date').innerText = formatDate(dateInput);
+        document.getElementById('poster-venue').innerText = venue;
+
+        // 4. 조 편성 카드 생성
+        const posterMain = document.getElementById('poster-main');
+        posterMain.innerHTML = ""; // 기존 카드 초기화
+
+        // 4명씩 조를 나눔 (최대 3조)
+        const groupsData = [
+            { id: 1, time: "07:30 AM", players: players.slice(0, 4) },
+            { id: 2, time: "07:40 AM", players: players.slice(4, 8) },
+            { id: 3, time: "07:50 AM", players: players.slice(8, 12) }
+        ];
+
+        // 데이터가 있는 조만 렌더링
+        groupsData.forEach(group => {
+            if (group.players.length > 0) {
+                const cardHtml = createGroupCard(group);
+                posterMain.innerHTML += cardHtml;
+            }
+        });
+    }
+
+    function createGroupCard(group) {
+        let playerRowsHtml = "";
+        group.players.forEach((playerName, index) => {
+            playerRowsHtml += `
+                <div class="player-row">
+                    <div class="player-num">${index + 1}</div>
+                    <div class="player-name">${playerName}</div>
+                    <div class="player-icon">MG</div>
+                </div>
+            `;
+        });
+
+        // 4명 미만인 경우 빈 행 추가
+        for (let i = group.players.length; i < 4; i++) {
+             playerRowsHtml += `
+                <div class="player-row">
+                    <div class="player-num">${i + 1}가능합니다. 현재 사용하시는 HTML 파일의 코드를 수정하여, 이전에 보여드렸던 고급스러운 PGA 투어 포스터 스타일을 기본 배경이자 전체적인 고정 디자인으로 적용할 수 있습니다.
+
+이를 위해, 기존의 단순한 표/리스트 형태의 출력 부분을 복잡한 카드 형태의 CSS 레이아웃으로 변경하고, PGA 스타일의 이미지를 CSS 배경으로 설정하는 새로운 HTML 및 CSS 코드를 제공해 드리겠습니다. 또한, 기존의 기능(랜덤 섞기 등)은 그대로 유지되도록 JavaScript 로직을 업그레이드하겠습니다.
+
+아래의 전체 코드를 복사하여, 기존의 `mudeung_golf_draw.html` 파일 내용을 모두 지우고 붙여넣으세요.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>무등총원우회 골프월례대회 조편성</title>
+    <style>
+        /* [1. 전체 및 입력 제어판 스타일] */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif; /* 고급스러운 폰트 사용 추천 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f0f2f5; /* 기본 배경 */
+        }
+
+        /* 입력 폼 제어판 */
+        #control-panel {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            flex: 1 1 calc(33% - 15px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="date"],
+        .input-group textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        #actions {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .btn-sort {
+            background-color: #f7b731;
+            color: white;
+        }
+        .btn-sort:hover {
+            background-color: #fca130;
+        }
+
+        .btn-shuffle {
+            background-color: #2bcbba;
+            color: white;
+        }
+        .btn-shuffle:hover {
+            background-color: #26af9f;
+        }
+
+        .btn-download {
+            background-color: #d1d8e0;
+            color: #333;
+        }
+        .btn-download:hover {
+            background-color: #a5b1c2;
+        }
+
+        /* [2. 고정된 포스터 출력 스타일] */
+        #poster-container {
+            width: 100%;
+            max-width: 1024px; /* 포스터 해상도 고정 */
+            aspect-ratio: 1024 / 731; /* 포스터 비율 고정 */
+            background-image: url('[https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj](https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj)');
+            background-size: cover;
+            background-position: center;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            color: white; /* 기본 텍스트는 흰색 */
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        /* 상단 로고 및 타이틀 섹션 */
+        #poster-header {
+            width: 100%;
+            text-align: center;
+            padding: 30px 0 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-logo-area {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .custom-logo {
+            width: 150px;
+            height: auto;
+        }
+
+        .stars {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .star {
+            color: #f7b731;
+            font-size: 14px;
+        }
+
+        #poster-header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #d8c39e;
+            margin: 0;
+            letter-spacing: -1px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        #poster-header h2 {
+            font-size: 18px;
+            font-weight: normal;
+            color: #ffffff;
+            margin: 5px 0 10px 0;
+            opacity: 0.9;
+        }
+
+        #event-details {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            margin-top: 15px;
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* 중앙 조 편성 카드 섹션 */
+        #poster-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 0 40px;
+            margin-top: 20px;
+            z-index: 1;
+        }
+
+        .group-card {
+            flex: 1;
+            max-width: 280px;
+            background: rgba(30, 40, 60, 0.9); /* 반투명 어두운 배경 */
+            border: 1px solid rgba(216, 195, 158, 0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .card-header {
+            width: 100%;
+            background: #f7b731; /* 그룹명 배경색 고정 */
+            color: #1e283c;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .card-time {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .card-body {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-row {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .player-row:last-child {
+            border-bottom: none;
+        }
+
+        .player-num {
+            width: 30px;
+            font-weight: bold;
+            color: #d8c39e;
+        }
+
+        .player-name {
+            flex: 1;
+            color: white;
+            font-weight: normal;
+        }
+
+        .player-icon {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* 하단 푸터 섹션 */
+        #poster-footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            opacity: 0.6;
+            margin-top: 10px;
+            z-index: 1;
+        }
+
+        .footer-logo {
+            width: 80px;
+            height: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="control-panel">
+    <div class="input-group">
+        <label for="event-title">대회 제목</label>
+        <input type="text" id="event-title" value="무등총원우회 골프월례대회">
+    </div>
+    <div class="input-group">
+        <label for="event-date">대회 일정</label>
+        <input type="date" id="event-date" value="2026-06-15">
+    </div>
+    <div class="input-group">
+        <label for="event-venue">장소</label>
+        <input type="text" id="event-venue" value="무등산CC">
+    </div>
+    <div class="input-group" style="flex: 1 1 100%;">
+        <label for="player-list">참가자 명단 (쉼표 또는 줄바꿈 구분)</label>
+        <textarea id="player-list">오유선,한승호,싱호,오유,홍길동,이순신,강감찬,김유신,장보고,계백,관창,을지문덕</textarea>
+    </div>
+    
+    <div id="actions">
+        <button class="btn-sort" onclick="performDraw(false)">[순서대로 편성]</button>
+        <button class="btn-shuffle" onclick="performDraw(true)">[🎲 랜덤 섞기]</button>
+        <button class="btn-download" onclick="alert('PNG 저장은 HTML2CANVAS 등 외부 라이브러리가 필요합니다.\n데모 버전에서는 포스터 디자인 고정을 확인하세요.')">[📸 PNG 저장]</button>
+    </div>
+</div>
+
+<div id="poster-container">
+    <div id="poster-header">
+        <div class="stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        </div>
+        <div class="main-logo-area">
+            <img src="[https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj](https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj)" alt="무등골프투어 로고" class="custom-logo">
+        </div>
+        <h2 id="poster-mg-tour">MG TOUR</h2>
+        <h1 id="poster-title-rendered"></h1>
+        <div id="event-details">
+            <div class="details-left">DATE: <span id="poster-date"></span></div>
+            <div class="details-venue">VENUE: <span id="poster-venue"></span></div>
+            <div class="details-right">GROUP DRAW RESULT</div>
+        </div>
+    </div>
+
+    <div id="poster-main">
+        </div>
+
+    <div id="poster-footer">
+        <img src="[https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj](https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj)" alt="PGA 파트너" class="footer-logo">
+        <img src="[https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj](https://lh3.googleusercontent.com/rd-gg-dl/AFfU-fIAMekXixRP-M5gICAMJnMC62QDquv_BiyjZusNcYtYjaFvJhMBnwHlfDg0qRIXdA8s5kCI3k9rLGVwsqtyGX9UMeB5yu7tfqhUVGiquA_HebxFzrdjDk4UeKNL6q9upsUtS7fc0tffzQ6WYeMtSrCrRvadfwax6bVkefjGSHt-dxege8x0YorzXdbmslb0My1U97BIfGN-iqKsd0CKTgUWfHAwGFCpu8LIY5hFHEO5m9HIkbZDW9ioi5oW4rXxX_Ng3fX2_-n_sKqywiwM7cCusmR_1V7s0q_vj8p5xzEKE7ayC9HaKthWp8kSan-GP18YkygTMY81kNv34RC2_YpJlF_VniC3V-3g75z6USumTfE4P1sQoXTCNRD-rWqIfj2lenViNSirYw_EDUSyuxapTE3Hlq6AyuyyLEcPNMYcqcwJsWzcX7SJpcQ7fFfLCYBag69JGc_FslQ1IhcWc7smnA0LKnc5-1NWJuWAkdtZLrON07-4AY1uSfgOH0DHi2t0CQQUpSyWPcB4Ln6SXGLdMif9LOce3clKgEUuE2hxFgdb5l_EiV6XeZiXTw84IGaWgY6EkZ49SirHUKnTSEDNywIp18brdZ3r-9eiyZ8JkAMdEHf8RPlWINGOsVxQc2WJCjTK8ABqK1oG2Bp-D_XW10le0OskQ_M4EcS6QWVS2K_u31mzsK_dTg-Vbnw_jituwq60aUOUFUH2xu0mDuGGYLDwJASXTo1XeCkQXuTqCwaaoKz52TFgSYGaSBurHZwo1c4oxYNuvn6RH1wQ09ot2UAI0CYbJH9M9L0Z1iGm1603UOGwI4VFxAQ-Uo411kMuTZET87Ly_a8MXQW0tRS7RkIcnbkAgaDl8MhhyZi1Bna6qeZ14kZ-QJ09fnZabBqimxdirmTzM-Hi51MRitfs7MCyBVdWUZ8KlIvqyKtO8kG1lrsANrBwymDsgJ_hjgZ1qjx0lv6GLMjTr3WepX0bywHCHquI0uXtIjoxEDhMhDfuaqTaNZ3rEYuHhNAhZIngILdnF-OuHW9XBDCRfksnjZCCC5nPgq3O_XFo6fw1xqK9OI_GFcNWZtRlXlMNiC58Aslo07RnYCzv3xBMvJjGA4Om99uJvUBfF3RrqWsM7BN0MKAEXtMXk5WJXLW46jIceQxljJ3wIWb_XSUzWYFaWXVadi1f7Xf7_5EmNmVkFe9_Qg0MnhhlBysKu8tnJrmTmr99a8c0nMlEUE_3JNmvci3koZ3rYdGfdoeV4kLd7WWgNaF9tkhD5mA=s1024-rj)" alt="무등프투어" class="footer-logo">
+    </div>
+</div>
+
+<script>
+    // [JavaScript: 로직 업그레이드]
+
+    // 페이지 로드 시 초기 렌더링
+    window.onload = function() {
+        performDraw(false);
+    };
+
+    function performDraw(shuffleFlag) {
+        // 1. 입력 데이터 가져오기
+        const title = document.getElementById('event-title').value;
+        const dateInput = document.getElementById('event-date').value;
+        const venue = document.getElementById('event-venue').value;
+        const playersString = document.getElementById('player-list').value;
+
+        // 2. 입력 데이터 파싱
+        const players = playersString.split(/[\s,]+/).filter(name => name.trim() !== "");
+        if (shuffleFlag) {
+            shuffleArray(players);
+        }
+
+        // 3. 포스터 고정 영역 업데이트 (타이틀, 날짜, 장소)
+        document.getElementById('poster-title-rendered').innerText = title;
+        document.getElementById('poster-date').innerText = formatDate(dateInput);
+        document.getElementById('poster-venue').innerText = venue;
+
+        // 4. 조 편성 카드 생성
+        const posterMain = document.getElementById('poster-main');
+        posterMain.innerHTML = ""; // 기존 카드 초기화
+
+        // 4명씩 조를 나눔 (최대 3조)
+        const groupsData = [
+            { id: 1, time: "07:30 AM", players: players.slice(0, 4) },
+            { id: 2, time: "07:40 AM", players: players.slice(4, 8) },
+            { id: 3, time: "07:50 AM", players: players.slice(8, 12) }
+        ];
+
+        // 데이터가 있는 조만 렌더링
+        groupsData.forEach(group => {
+            if (group.players.length > 0) {
+                const cardHtml = createGroupCard(group);
+                posterMain.innerHTML += cardHtml;
+            }
+        });
+    }
+
+    function createGroupCard(group) {
+        let playerRowsHtml = "";
+        group.players.forEach((playerName, index) => {
+            playerRowsHtml += `
+                <div class="player-row">
+                    <div class="player-num">${index + 1}</div>
+                    <div class="player-name">${playerName}</div>
+                    <div class="player-icon">MG</div>
+                </div>
+            `;
+        });
+
+        // 4명 미만인 경우 빈 행 추가
+        for (let i = group.players.length; i < 4; i++) {
+             playerRowsHtml += `
+                <div class="player-row" style="opacity: 0.3;">
+                    <div class="player-num">${i + 1}</div>
+                    <div class="player-name">(비어있음)</div>
+                    <div class="player-icon">MG</div>
+                </div>
+            `;
+        }
+
+        const cardHtml = `
+            <div class="group-card">
+                <div class="card-header">
+                    <div class="card-title">GROUP ${group.id}</div>
+                    <div class="card-time">1H · ${group.time}</div>
+                </div>
+                <div class="card-body">
+                    ${playerRowsHtml}
+                </div>
+            </div>
+        `;
+        return cardHtml;
+    }
+
+    // 배열 랜덤 섞기 함수
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // 날짜 포맷 함수 (YYYY-MM-DD -> YYYY.MM.DD)
+    function formatDate(dateString) {
+        if (!dateString) return "YYYY.MM.DD";
+        return dateString.replace(/-/g, '.');
+    }
+</script>
+
+</body>
+</html>
